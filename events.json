@@ -1,14 +1,8 @@
 [
   {
-    "name": "first",
-    "date": "March 30, 1989",
-    "description": "Lorum ipsum",
-    "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSmuBYIPuERT-idZ4iL3grny6Qe5rza8U0XAQ&s"
-  },
-  {
-    "name": "2",
-    "date": "April 5, 1989",
-    "description": "Lorem ipsum!",
-    "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSmuBYIPuERT-idZ4iL3grny6Qe5rza8U0XAQ&s"
+    "name": "The Arctic Voyage",
+    "date": "March 30, 2026",
+    "description": "Exploring the frozen north.",
+    "image": "photos/ship1.png"
   }
 ]
