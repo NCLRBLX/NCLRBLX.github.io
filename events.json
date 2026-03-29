@@ -2,7 +2,15 @@
   {
     "name": "The Arctic Voyage",
     "date": "March 30, 2026",
-    "description": "Exploring the frozen north.",
-    "image": "photos/1.jpg"
+    "description": "Lorum ipsum",
+    "image": "photos/1.jpg",
+    "status": "upcoming"
+  },
+  {
+    "name": "Grand Opening Gala",
+    "date": "January 15, 2026",
+    "description": "lorum ipsum 2",
+    "image": "photos/2.jpg",
+    "status": "past"
   }
 ]
