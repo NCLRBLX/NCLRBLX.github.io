@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nortox Cruise Lines</title>
+    <title>Nortox Cruise Line</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Doto:wght@400;700&display=swap" rel="stylesheet">
@@ -13,21 +13,24 @@
             background-color: #0e0e0e;
             color: #ffffff;
             margin: 0;
-            padding: 0;
             font-family: 'Doto', sans-serif;
-            height: 100vh;
-            width: 100vw;
-            overflow: hidden;
+            overflow-x: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* Typewriter at the top center */
+        #header-section {
+            height: 250px;
+            width: 100%;
             position: relative;
         }
 
         #typewriter-container {
             position: absolute;
-            /* 50 pixels from the top */
             top: 50px;  
-            /* Move to the horizontal center */
             left: 50%;
-            /* This centers the element itself so the middle of the text is at 50% */
             transform: translateX(-50%);
             text-align: center;
         }
@@ -42,56 +45,103 @@
             animation: blink 0.7s infinite step-end;
         }
 
-        @keyframes blink {
-            50% { border-color: transparent; }
+        /* Event Cards */
+        #events-display {
+            width: 80%;
+            max-width: 800px;
+            margin-top: 20px;
         }
+
+        .event-card {
+            background: #1a1a1a;
+            border: 1px solid #444;
+            padding: 20px;
+            margin-bottom: 20px;
+            transition: 0.3s;
+        }
+
+        .event-card:hover {
+            border-color: #fff;
+        }
+
+        .event-card img {
+            width: 100%;
+            max-height: 300px;
+            object-fit: cover;
+            margin-top: 10px;
+            border: 1px solid #333;
+        }
+
+        .event-date { color: #888; font-size: 0.9rem; }
+
+        @keyframes blink { 50% { border-color: transparent; } }
     </style>
 </head>
 <body>
 
-    <div id="typewriter-container">
-        <div id="typewriter"></div>
+    <div id="header-section">
+        <div id="typewriter-container">
+            <div id="typewriter"></div>
+        </div>
+    </div>
+
+    <div id="events-display">
+        <h2>Upcoming Events & Gallery</h2>
+        <div id="event-list">Loading events from GitHub...</div>
     </div>
 
     <script>
+        // 1. TYPEWRITER LOGIC
         const textElement = document.getElementById('typewriter');
-        const phrases = [
-            "Welcome!",
-            "Nortox Cruise Lines: The cruise king!"
-        ];
-        
-        let phraseIndex = 0;
-        let charIndex = 0;
-        let isDeleting = false;
+        const phrases = ["Welcome!", "Nortox Cruise Line: The cruise king!"];
+        let phraseIndex = 0, charIndex = 0, isDeleting = false;
 
         function type() {
             const currentPhrase = phrases[phraseIndex];
-            
-            if (isDeleting) {
-                textElement.innerText = currentPhrase.substring(0, charIndex - 1);
-                charIndex--;
-            } else {
-                textElement.innerText = currentPhrase.substring(0, charIndex + 1);
-                charIndex++;
-            }
-
-            let typeSpeed = 100; // 0.1s per letter
-
-            if (!isDeleting && charIndex === currentPhrase.length) {
-                typeSpeed = 2000; // 2s pause at end
-                isDeleting = true;
-            } else if (isDeleting && charIndex === 0) {
-                isDeleting = false;
-                phraseIndex = (phraseIndex + 1) % phrases.length;
-                typeSpeed = 500; 
-            } else if (isDeleting) {
-                typeSpeed = 50; 
-            }
-
+            textElement.innerText = isDeleting ? currentPhrase.substring(0, charIndex - 1) : currentPhrase.substring(0, charIndex + 1);
+            isDeleting ? charIndex-- : charIndex++;
+            let typeSpeed = 100;
+            if (!isDeleting && charIndex === currentPhrase.length) { typeSpeed = 2000; isDeleting = true; }
+            else if (isDeleting && charIndex === 0) { isDeleting = false; phraseIndex = (phraseIndex + 1) % phrases.length; typeSpeed = 500; }
+            else if (isDeleting) { typeSpeed = 50; }
             setTimeout(type, typeSpeed);
         }
 
-        window.onload = type;
+        // 2. GITHUB FETCH LOGIC
+        // REPLACE THESE TWO LINES WITH YOUR INFO:
+        const GITHUB_USER = "YourUsername"; 
+        const REPO_NAME = "YourRepoName";
+        const FILE_PATH = "events.json";
+
+        async function fetchEvents() {
+            const url = `https://raw.githubusercontent.com/${GITHUB_USER}/${REPO_NAME}/main/${FILE_PATH}`;
+            
+            try {
+                const response = await fetch(url);
+                const events = await response.json();
+                const list = document.getElementById('event-list');
+                list.innerHTML = ''; // Clear loading text
+
+                events.forEach(event => {
+                    const card = document.createElement('div');
+                    card.className = 'event-card';
+                    card.innerHTML = `
+                        <div class="event-date">${event.date}</div>
+                        <h3>${event.name}</h3>
+                        <p>${event.description}</p>
+                        ${event.image ? `<img src="${event.image}" alt="cruise">` : ''}
+                    `;
+                    list.appendChild(card);
+                });
+            } catch (error) {
+                document.getElementById('event-list').innerText = "Failed to load events. Make sure events.json exists!";
+            }
+        }
+
+        window.onload = () => {
+            type();
+            fetchEvents();
+        };
     </script>
 </body>
 </html>
