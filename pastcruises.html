@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Past Cruises | NCLR</title>
+    <link href="https://fonts.googleapis.com/css2?family=Doto:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background-color: #0e0e0e;
+            color: #ffffff;
+            margin: 0;
+            padding: 40px;
+            font-family: 'Doto', sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .nav-header {
+            width: 100%;
+            max-width: 1200px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #333;
+            padding-bottom: 20px;
+            margin-bottom: 40px;
+        }
+        .btn-back {
+            color: #888;
+            text-decoration: none;
+            border: 1px solid #444;
+            padding: 8px 15px;
+            transition: 0.3s;
+        }
+        .btn-back:hover { color: #fff; border-color: #fff; }
+
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 25px;
+            width: 100%;
+            max-width: 1200px;
+        }
+        .photo-card {
+            background: #161616;
+            border: 1px solid #222;
+            padding: 15px;
+            transition: 0.3s;
+        }
+        .photo-card:hover { border-color: #00ffcc; transform: translateY(-5px); }
+        .photo-card img {
+            width: 100%;
+            height: 250px;
+            object-fit: cover;
+            filter: grayscale(30%);
+            transition: 0.3s;
+        }
+        .photo-card:hover img { filter: grayscale(0%); }
+        .caption { margin-top: 15px; font-weight: bold; letter-spacing: 1px; }
+        .date { font-size: 0.8rem; color: #00ffcc; }
+    </style>
+</head>
+<body>
+
+    <div class="nav-header">
+        <a href="index.html" class="btn-back"><- Return Home</a>
+        <h1 style="margin:0; font-size: 1.5rem;">CRUISE LOGS</h1>
+    </div>
+
+    <div class="gallery-grid" id="gallery-list">
+        Synchronizing with GitHub...
+    </div>
+
+    <script>
+        const USER = "NCLRBLX";
+        const REPO = "NCLRBLX.github.io";
+        const FILE = "events.json";
+async function loadGallery() {
+    const url = `https://api.github.com/repos/${USER}/${REPO}/contents/${FILE}?t=${Date.now()}`;
+    try {
+        const res = await fetch(url);
+        const data = await res.json();
+        const events = JSON.parse(atob(data.content));
+        const list = document.getElementById('gallery-list');
+        list.innerHTML = ''; 
+
+        // ONLY show events marked as "past"
+        const past = events.filter(event => event.status === 'past');
+
+        if (past.length === 0) {
+            list.innerHTML = "<p>No past cruise logs found.</p>";
+            return;
+        }
+
+        past.forEach(item => {
+            const card = document.createElement('div');
+            card.className = 'photo-card';
+            card.innerHTML = `
+                <img src="${item.image}" alt="Cruise Log">
+                <div class="caption">${item.name}</div>
+                <div class="date">${item.date}</div>
+            `;
+            list.appendChild(card);
+        });
+    } catch (e) {
+        document.getElementById('gallery-list').innerText = "Gallery Sync Failed.";
+    }
+}        window.onload = loadGallery;
+    </script>
+</body>
+</html>

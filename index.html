@@ -4,6 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Nortox Cruise Line</title>
+    
+    <script>
+        if (window.location.hash === '#discord' || window.location.search.includes('discord')) {
+            window.location.href = "https://discord.gg/8NuwPhRy2w";
+        }
+    </script>
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Doto:wght@400;700&display=swap" rel="stylesheet">
@@ -14,25 +21,17 @@
             color: #ffffff;
             margin: 0;
             font-family: 'Doto', sans-serif;
-            overflow-x: hidden;
             display: flex;
             flex-direction: column;
             align-items: center;
+            min-height: 100vh;
         }
 
-        /* Typewriter at the top center */
         #header-section {
-            height: 250px;
-            width: 100%;
-            position: relative;
-        }
-
-        #typewriter-container {
-            position: absolute;
-            top: 50px;  
-            left: 50%;
-            transform: translateX(-50%);
+            padding-top: 60px;
             text-align: center;
+            width: 100%;
+            margin-bottom: 20px;
         }
 
         #typewriter {
@@ -45,34 +44,69 @@
             animation: blink 0.7s infinite step-end;
         }
 
-        /* Event Cards */
-        #events-display {
-            width: 80%;
+        /* Navigation Container */
+        .nav-container {
+            margin-top: 30px;
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap; /* Helps on smaller screens */
+        }
+
+        .btn {
+            background: #111;
+            color: white;
+            border: 1px solid #fff;
+            padding: 12px 24px;
+            text-decoration: none;
+            font-family: 'Doto';
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: 0.2s;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+
+        .btn:hover {
+            background: #fff;
+            color: #000;
+        }
+
+        .icon { width: 20px; height: 20px; }
+
+        /* Events Section */
+        #events-section {
+            width: 90%;
             max-width: 800px;
-            margin-top: 20px;
+            margin-top: 40px;
+            padding: 20px;
+        }
+
+        .section-title {
+            border-bottom: 2px solid #333;
+            padding-bottom: 10px;
+            margin-bottom: 30px;
+            text-transform: uppercase;
+            letter-spacing: 3px;
         }
 
         .event-card {
-            background: #1a1a1a;
-            border: 1px solid #444;
-            padding: 20px;
-            margin-bottom: 20px;
-            transition: 0.3s;
-        }
-
-        .event-card:hover {
-            border-color: #fff;
+            background: #161616;
+            border-left: 5px solid #00ffcc;
+            padding: 25px;
+            margin-bottom: 30px;
         }
 
         .event-card img {
             width: 100%;
-            max-height: 300px;
+            max-height: 450px;
             object-fit: cover;
-            margin-top: 10px;
+            margin-top: 20px;
             border: 1px solid #333;
         }
 
-        .event-date { color: #888; font-size: 0.9rem; }
+        .event-date { color: #00ffcc; font-weight: bold; margin-bottom: 5px; }
 
         @keyframes blink { 50% { border-color: transparent; } }
     </style>
@@ -80,68 +114,82 @@
 <body>
 
     <div id="header-section">
-        <div id="typewriter-container">
-            <div id="typewriter"></div>
+        <div id="typewriter"></div>
+        
+        <div class="nav-container">
+            <a href="https://discord.gg/8NuwPhRy2w" class="btn" target="_blank">
+                <img src="https://cdn-icons-png.flaticon.com/512/3670/3670157.png" class="icon" alt="Discord"> 
+                Discord
+            </a>
+            
+            <a href="pastcruises.html" class="btn">
+                🚢 Past Cruises
+            </a>
+
+            <a href="merch.html" class="btn">
+                👕 Merch
+            </a>
         </div>
     </div>
 
-    <div id="events-display">
-        <h2>Upcoming Events & Gallery</h2>
-        <div id="event-list">Loading events from GitHub...</div>
+    <div id="events-section">
+        <h2 class="section-title">Upcoming Voyages</h2>
+        <div id="event-list">Syncing manifests...</div>
     </div>
 
     <script>
-        // 1. TYPEWRITER LOGIC
+        const USER = "NCLRBLX";
+        const REPO = "NCLRBLX.github.io";
+        const FILE = "events.json";
+
+        // TYPEWRITER
         const textElement = document.getElementById('typewriter');
         const phrases = ["Welcome!", "Nortox Cruise Line: The cruise king!"];
-        let phraseIndex = 0, charIndex = 0, isDeleting = false;
+        let pIdx = 0, cIdx = 0, isDel = false;
 
         function type() {
-            const currentPhrase = phrases[phraseIndex];
-            textElement.innerText = isDeleting ? currentPhrase.substring(0, charIndex - 1) : currentPhrase.substring(0, charIndex + 1);
-            isDeleting ? charIndex-- : charIndex++;
-            let typeSpeed = 100;
-            if (!isDeleting && charIndex === currentPhrase.length) { typeSpeed = 2000; isDeleting = true; }
-            else if (isDeleting && charIndex === 0) { isDeleting = false; phraseIndex = (phraseIndex + 1) % phrases.length; typeSpeed = 500; }
-            else if (isDeleting) { typeSpeed = 50; }
-            setTimeout(type, typeSpeed);
+            const curr = phrases[pIdx];
+            textElement.innerText = isDel ? curr.substring(0, cIdx - 1) : curr.substring(0, cIdx + 1);
+            isDel ? cIdx-- : cIdx++;
+            let speed = 100;
+            if (!isDel && cIdx === curr.length) { speed = 2000; isDel = true; }
+            else if (isDel && cIdx === 0) { isDel = false; pIdx = (pIdx + 1) % phrases.length; speed = 500; }
+            else if (isDel) { speed = 50; }
+            setTimeout(type, speed);
+        }
+async function fetchEvents() {
+    const url = `https://api.github.com/repos/${USER}/${REPO}/contents/${FILE}?t=${Date.now()}`;
+    try {
+        const response = await fetch(url);
+        const data = await response.json();
+        const events = JSON.parse(atob(data.content));
+        const list = document.getElementById('event-list');
+        list.innerHTML = ''; 
+
+        // ONLY show events marked as "upcoming"
+        const upcoming = events.filter(event => event.status === 'upcoming');
+
+        if (upcoming.length === 0) {
+            list.innerHTML = "<p>No voyages currently scheduled. Check back soon!</p>";
+            return;
         }
 
-        // 2. GITHUB FETCH LOGIC
-        // REPLACE THESE TWO LINES WITH YOUR INFO:
-        const GITHUB_USER = "NCLRBLX"; 
-        const REPO_NAME = "NCLRBLKX.github.io";
-        const FILE_PATH = "events.json";
-
-        async function fetchEvents() {
-            const url = `https://raw.githubusercontent.com/${GITHUB_USER}/${REPO_NAME}/main/${FILE_PATH}`;
-            
-            try {
-                const response = await fetch(url);
-                const events = await response.json();
-                const list = document.getElementById('event-list');
-                list.innerHTML = ''; // Clear loading text
-
-                events.forEach(event => {
-                    const card = document.createElement('div');
-                    card.className = 'event-card';
-                    card.innerHTML = `
-                        <div class="event-date">${event.date}</div>
-                        <h3>${event.name}</h3>
-                        <p>${event.description}</p>
-                        ${event.image ? `<img src="${event.image}" alt="cruise">` : ''}
-                    `;
-                    list.appendChild(card);
-                });
-            } catch (error) {
-                document.getElementById('event-list').innerText = "Failed to load events. Make sure events.json exists!";
-            }
-        }
-
-        window.onload = () => {
-            type();
-            fetchEvents();
-        };
+        upcoming.forEach(event => {
+            const card = document.createElement('div');
+            card.className = 'event-card';
+            card.innerHTML = `
+                <div class="event-date">${event.date}</div>
+                <h3 style="margin:0;">${event.name}</h3>
+                <p style="color: #ccc;">${event.description}</p>
+                ${event.image ? `<img src="${event.image}">` : ''}
+            `;
+            list.appendChild(card);
+        });
+    } catch (error) {
+        document.getElementById('event-list').innerText = "GitHub Sync Offline.";
+    }
+}
+        window.onload = () => { type(); fetchEvents(); };
     </script>
 </body>
-</html>  
+</html>
